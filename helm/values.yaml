@@ -1,0 +1,42 @@
+persistentVolumeClaim:
+  enabled: true
+  name: golang-mathapp-pv-claim
+  accessModes: ReadWriteOnce
+  storage: 10Gi
+
+service:
+  port: 80
+  targetPort: 80
+  type: ClusterIP
+
+deployment:
+  replicas: 1
+
+container:
+  image: soussioumaima/golang-mathapp:latest
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  ports:
+    containerPort: 8010
+    name: http
+
+volumeMounts:
+  name:  golang-mathapp-persistent-storage
+  mountPath: /data
+
+volume:
+  name: golang-mathapp-persistent-storage
+  claimName: getting-started-pv-claim
+
+ingress:
+  enabled: true
+  host: oumaimasoussi-host.horizon-workspaces.com
+  ingressClassName: nginx
+  pathType: ImplementationSpecific
+  clusterIssuer: letsencrypt-prod
+  secretName: golang-mathapp-tls
